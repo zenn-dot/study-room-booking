@@ -4,55 +4,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Room Booking</title>
-    <link rel="stylesheet" href="style.css">
+    <title>StudySpot — Study Room Booking</title>
+
+    <style>
+        /* The font and room photo are saved beside this HTML file. */
+        @font-face {
+            font-family: Oswald;
+            src: url("oswald.ttf");
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f9c7d5;
+            color: #681b35;
+            font-family: Oswald, "Arial Narrow", Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Keep the photograph behind the text and menu. */
+        .home {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100svh;
+        }
+
+        .room-photo {
+            position: absolute;
+            top: 28%;
+            bottom: 0;
+            width: 100%;
+            background-image: linear-gradient(#f9c7d5, transparent 25%), url("room.png");
+            background-size: cover, auto 120%;
+            background-position: center bottom;
+        }
+
+        /* Keep the logo on the left and the menu on the right. */
+        header {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 48px 4% 0;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: -1px;
+            line-height: 1.3;
+        }
+
+        h1 {
+            position: absolute;
+            top: 48px;
+            left: 50%;
+            width: 52%;
+            max-width: 480px;
+            margin: 0;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 32px;
+            font-weight: normal;
+            line-height: 1.3;
+        }
+
+        /* Narrow the lettering to match the recording. */
+        .description {
+            display: block;
+            transform: scaleX(0.94);
+        }
+
+        nav {
+            position: relative;
+            width: 145px;
+        }
+
+        button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 51px;
+            padding: 8px;
+            border: none;
+            border-radius: 9px;
+            background: #681b35;
+            color: #f9c7d5;
+            font: inherit;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        button:hover,
+        button[aria-expanded="true"] {
+            background: #c3215a;
+        }
+
+        .menu {
+            position: absolute;
+            top: 100%;
+            width: 100%;
+            margin-top: 21px;
+            padding: 12px 8px;
+            border-radius: 9px;
+            background: #c3215a;
+            color: #f9c7d5;
+            z-index: 1;
+        }
+
+        .menu a {
+            display: block;
+            padding: 8px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .menu a:hover {
+            text-decoration: underline;
+            text-underline-offset: 5px;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 4px;
+        }
+
+        /* Opening screens: dark logo, light logo, photo, homepage. */
+        .intro {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #681b35;
+            color: #f9c7d5;
+            font-size: 64px;
+            font-weight: bold;
+            z-index: 2;
+            isolation: isolate;
+            transition: background 1.4s ease-in-out, color 1.4s ease-in-out,
+                font-size 1.4s ease-in-out, opacity 1.4s ease-in-out;
+        }
+
+        .intro.light {
+            background: #f9c7d5;
+            color: #951841;
+            font-size: 48px;
+        }
+
+        /* Fade the photo in behind the same centered logo. */
+        .intro::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("room.png") center / cover;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 1.4s ease-in-out;
+        }
+
+        .intro.photo {
+            background: transparent;
+        }
+
+        .intro.photo::before {
+            opacity: 1;
+        }
+
+        header, h1 {
+            transition: opacity 1.4s ease-in-out;
+        }
+
+        .opening header,
+        .opening h1 {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Use smaller text and spacing on phones. */
+        @media (max-width: 650px) {
+            header {
+                padding: 30px 6% 0;
+            }
+
+            .logo {
+                font-size: 30px;
+            }
+
+            h1 {
+                top: 120px;
+                width: 88%;
+                font-size: 28px;
+            }
+
+            .description {
+                transform: none;
+            }
+
+            .description br {
+                display: none;
+            }
+
+            nav {
+                width: 120px;
+            }
+
+            .room-photo {
+                top: 38%;
+                background-size: cover;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .intro, .intro::before, header, h1 {
+                transition: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="intro" id="intro" aria-hidden="true">StudySpot</div>
 
-    <header>
-        <h1>Study Room Booking</h1>
+    <main class="home opening" id="home">
+        <div class="room-photo" aria-hidden="true"></div>
 
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="rooms.html">Rooms</a>
-            <a href="bookings.html">My Bookings</a>
-        </nav>
-    </header>
+        <header>
+            <a class="logo" href="index.html">StudySpot</a>
 
-    <main>
-        <section class="hero">
-            <h2>Find a place to study</h2>
+            <nav id="navigation" aria-label="Main navigation">
+                <button id="menuButton" type="button" aria-expanded="false" aria-controls="menu">
+                    MENU
+                </button>
 
-            <p>
-                Choose a study room, select a time and make a booking.
-            </p>
+                <div class="menu" id="menu" hidden>
+                    <a href="index.html" id="homeLink" aria-current="page">HOME</a>
+                    <a href="rooms.html">ROOMS</a>
+                    <a href="bookings.html">BOOKING</a>
+                </div>
+            </nav>
+        </header>
 
-            <a class="main-button" href="rooms.html">
-                View Rooms
-            </a>
-        </section>
-
-        <section class="features">
-
-            <div class="feature">
-                <h3>1. Choose</h3>
-                <p>Choose a study room.</p>
-            </div>
-
-            <div class="feature">
-                <h3>2. Select</h3>
-                <p>Select an available time.</p>
-            </div>
-
-            <div class="feature">
-                <h3>3. Book</h3>
-                <p>Confirm your booking.</p>
-            </div>
-
-        </section>
+        <h1>
+            <span class="description">We help students find and book<br>
+                study spaces easily, creating<br>
+                more time for productive learning</span>
+        </h1>
     </main>
 
+    <script>
+        // Play the opening once, then stay on the homepage.
+        const intro = document.getElementById("intro");
+        const home = document.getElementById("home");
+        let lightTimer;
+        let photoTimer;
+        let homeTimer;
+        let hideTimer;
+
+        function startOpening() {
+            clearTimeout(lightTimer);
+            clearTimeout(photoTimer);
+            clearTimeout(homeTimer);
+            clearTimeout(hideTimer);
+            closeMenu();
+            window.scrollTo(0, 0);
+            home.classList.add("opening");
+            intro.classList.remove("light", "photo");
+            intro.style.display = "flex";
+            intro.style.opacity = "1";
+
+            // First show the dark screen, then the light screen.
+            lightTimer = setTimeout(function () {
+                intro.classList.add("light");
+            }, 1400);
+
+            // Keep the smaller logo in place while the photo fades in.
+            photoTimer = setTimeout(function () {
+                intro.classList.add("photo");
+            }, 4000);
+
+            // Slowly fade from the photo opening to the homepage.
+            homeTimer = setTimeout(function () {
+                home.classList.remove("opening");
+                intro.style.opacity = "0";
+            }, 6600);
+
+            // Hide the opening after the fade finishes.
+            hideTimer = setTimeout(function () {
+                intro.style.display = "none";
+            }, 8000);
+        }
+
+        // Open and close the navigation menu.
+        const menuButton = document.getElementById("menuButton");
+        const menu = document.getElementById("menu");
+        const navigation = document.getElementById("navigation");
+
+        function closeMenu() {
+            menu.hidden = true;
+            menuButton.setAttribute("aria-expanded", "false");
+        }
+
+        // HOME closes the menu without reloading the homepage.
+        const homeLink = document.getElementById("homeLink");
+
+        homeLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            closeMenu();
+            menuButton.focus();
+        });
+
+        menuButton.addEventListener("click", function () {
+            if (menu.hidden) {
+                menu.hidden = false;
+                menuButton.setAttribute("aria-expanded", "true");
+            } else {
+                closeMenu();
+            }
+        });
+
+        // Clicking outside the menu closes it.
+        document.addEventListener("click", function (event) {
+            if (!navigation.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
+        // Press Escape to close the menu using the keyboard.
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !menu.hidden) {
+                closeMenu();
+                menuButton.focus();
+            }
+        });
+        // The logo link reloads this page and replays the opening.
+        // Returning with the browser Back button also starts it again.
+        window.addEventListener("pageshow", startOpening);
+    </script>
 </body>
 
 </html>

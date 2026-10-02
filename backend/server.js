@@ -1,5 +1,6 @@
 import http from 'http'
-import mysql from 'mysql'
+import mysql from 'mysql2/promise'
+
 
 const db = await mysql.createConnection({
     host: 'localhost',
@@ -29,6 +30,30 @@ const server = http.createServer(async (req, res)=>{
     return
   }
 
+  if (req.method === 'POST' && req.url === '/bookings'){
+    let body = ''
+    req.on('data', chunk => {
+      body += chunk
+    })
+    req.on('end', async ()  => {
+      const booking = JSON.parse(body)
+      console.log(booking)
+      await dbexecute(
+        `INSERT INTO bookings
+        (room_id, user_id, date, start_time, end_time)
+        VALUES(?, ?, ?, ?, ?)`,
+        [
+          booking.room_id,
+          booking.user_id,
+          booking.date,
+          booking.start_time,
+          booking.end_time
+        ]
+      )
+      res.end('Booking received')
+    })
+    return
+  }
 
 })
 

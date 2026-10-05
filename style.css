@@ -1,199 +1,1039 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+
+/* Негізгі бет стилі. */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
 }
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    color: #222;
+    background: #f3f1ec;
+    color: #0e1a2e;
+    font-family: 'Bricolage Grotesque', Arial, sans-serif;
+    line-height: 1.5;
+    min-width: 1400px;
 }
 
-/* HEADER */
+button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+}
 
-header {
-    background-color: #243447;
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+:focus-visible {
+    outline: 2px solid #8b9bb4;
+    outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+    font-weight: 200;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+svg.i {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex: none;
+}
+
+.wrap {
+    position: relative;
+    width: 1400px;
+    margin: 0 auto;
+    padding: 0 64px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    font-weight: 500;
+    opacity: .7;
+}
+
+section {
+    position: relative;
+    overflow-x: clip;
+    padding: 168px 0;
+}
+
+section.pt {
+    padding-top: 210px;
+}
+
+.alt {
+    background: #fff;
+}
+
+/* Сәндік үлкен сандар мен мәтін. */
+.gh {
+    position: absolute;
+    right: -28px;
+    top: 6%;
+    font-size: 476px;
+    font-weight: 800;
+    line-height: .8;
+    color: rgba(20, 35, 63, .05);
+    pointer-events: none;
+    user-select: none;
+}
+
+.mq {
+    overflow: hidden;
+    padding: 40px 0 8px;
+}
+
+.mqt {
+    white-space: nowrap;
+    font-size: 140px;
+    font-weight: 200;
+    text-transform: uppercase;
+    color: rgba(20, 35, 63, .16);
+    line-height: 1;
+}
+
+.mqt b {
+    color: #14233f;
+    font-weight: 200;
+}
+
+/* Жоғарғы мәзірдің орналасуы. */
+nav {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
     color: white;
+    background: transparent;
+}
 
+nav .wrap {
+    width: 100%;
+    min-width: 0;
+    gap: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+}
+
+.logo {
+    font-weight: 800;
+    letter-spacing: .06em;
+    font-size: 20px;
+}
+
+.links {
+    margin-left: auto;
+    display: flex;
+    gap: 48px;
+    font-size: 14px;
+}
+
+.links a {
+    position: relative;
+    opacity: .85;
+}
+
+.links a:hover,
+.links a[aria-current] {
+    opacity: 1;
+}
+
+.menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: #14233f;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 112px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.menu a {
+    font-size: 96px;
+    font-weight: 200;
+    text-transform: uppercase;
+    line-height: 1.15;
+}
+
+.menu button {
+    position: absolute;
+    top: 24px;
+    right: 64px;
+}
+
+/* Батырмалардың көрінісі. */
+.btn {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 32px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: .24em;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.btn:hover {
+    color: #14233f;
+}
+
+.btn.fill {
+    background: #14233f;
+    color: #fff;
+    border-color: #14233f;
+}
+
+/* Басты беттің фон суреті мен тақырыбы. */
+.hero {
+    position: relative;
+    height: 900px;
+    min-height: 640px;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    overflow: hidden;
+    background: #14233f;
+}
+
+.hero .bg {
+    position: absolute;
+    inset: 0;
+    background: url('main.jpg') center/cover;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(14, 26, 46, .55), rgba(20, 35, 63, .45) 45%, rgba(14, 26, 46, .88));
+}
+
+.hero h1 {
+    font-size: 72.8px;
+    letter-spacing: -.02em;
+    font-weight: 500;
+}
+
+.hero .btn {
+    margin-top: 48px;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: 11px;
+    letter-spacing: .5em;
+    margin-bottom: 40px;
+}
+
+.tag::before,
+.tag::after {
+    content: "";
+    width: 56px;
+    height: 1px;
+    background: rgba(255, 255, 255, .6);
+}
+
+/* Тақырыптар мен бағандардың орналасуы. */
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 64px;
+}
+
+.head h2 {
+    font-size: 84px;
+}
+
+.head p {
+    max-width: 320px;
+    margin: 0;
+    opacity: .7;
+    font-size: 15px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 42px;
+}
+
+
+
+
+
+.statement {
+    font-size: 56px;
+    line-height: 1.15;
+    font-weight: 200;
+    margin: 0;
+    max-width: 900px;
+}
+
+/* Бөлме карточкаларының көрінісі. */
+.card {
+    display: block;
+    position: relative;
+    aspect-ratio: 4/3.4;
+    overflow: hidden;
+    background: #14233f;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.card:nth-child(even) {
+    margin-top: 84px;
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(14, 26, 46, .35), rgba(14, 26, 46, .82));
+}
+
+.card:hover::after {
+    opacity: .8;
+}
+
+.card .t {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card h3 {
+    font-size: 50.4px;
+    margin-top: 12px;
+    line-height: 1.02;
+}
+
+.card .m {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 12px;
+    letter-spacing: .2em;
+    gap: 16px;
+}
+
+/* Кесте мен брондау бөлімі. */
+.det {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 84px;
+    align-items: start;
+}
+
+.pic {
+    position: sticky;
+    top: 96px;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #14233f;
+}
+
+.over {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    z-index: 2;
+    color: #fff;
+    padding: 20px 24px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .35);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.over span {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.det h2 {
+    font-size: 84px;
+}
+
+.sub {
+    margin: 16px 0 40px;
+    font-size: 18px;
+    opacity: .7;
+    font-weight: 300;
+}
+
+.lab {
+    font-size: 12px;
+    letter-spacing: .24em;
+    font-weight: 500;
+    margin: 40px 0 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.scr {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.d {
+    flex: none;
+    min-width: 88px;
+    min-height: 72px;
+    border: 1px solid rgba(20, 35, 63, 0.22);
+    border-radius: 4px;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: .14em;
+}
+
+.d b {
+    display: block;
+    font-size: 28px;
+    font-weight: 200;
+    letter-spacing: 0;
+}
+
+.d:hover {
+    border-color: #14233f;
+}
+
+.d[aria-pressed=true] {
+    background: #14233f;
+    color: #fff;
+    border-color: #14233f;
+}
+
+.slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.s {
+    position: relative;
+    overflow: hidden;
+    min-height: 72px;
+    padding: 12px;
+    border: 1px solid rgba(20, 35, 63, 0.22);
+    border-radius: 4px;
+    text-align: left;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.s[aria-pressed=true] {
+    color: #fff;
+    border-color: #14233f;
+}
+
+.s small {
+    font-size: 10px;
+    letter-spacing: .2em;
+    opacity: .7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.s:hover:not(:disabled) {
+    border-color: #14233f;
+}
+
+.s:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+    background: rgba(20, 35, 63, .04);
+}
+
+.s:disabled small {
+    opacity: 1;
+    color: #b5483f;
+}
+
+.s.mine:disabled {
+    opacity: 1;
+    color: #14233f;
+}
+
+.panel {
+    margin-top: 32px;
+    padding: 24px;
+    border-radius: 4px;
+    background: rgba(139, 155, 180, .16);
+    border: 1px solid rgba(20, 35, 63, .14);
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    padding: 20px 8%;
+    gap: 24px;
 }
 
-header h1 {
-    margin: 0;
+.panel h3 {
+    font-size: 40px;
+    margin-top: 8px;
 }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    margin-left: 25px;
+/* Брондар тізімінің көрінісі. */
+.bk {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 32px 0;
+    border-top: 1px solid rgba(20, 35, 63, 0.22);
 }
 
-nav a:hover {
+.bk:last-child {
+    border-bottom: 1px solid rgba(20, 35, 63, 0.22);
+}
+
+.bk h3 {
+    font-size: 42px;
+}
+
+.bk .tm {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.bk .dt {
+    font-size: 12px;
+    letter-spacing: .2em;
+    opacity: .65;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.cx {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+}
+
+.cx .btn {
+    padding: 12px 20px;
+}
+
+.empty {
+    padding: 48px 0;
+    border-top: 1px solid rgba(20, 35, 63, 0.22);
+    font-weight: 300;
+    font-size: 20px;
+    opacity: .7;
+}
+
+/* Беттің төменгі бөлігі. */
+footer {
+    position: relative;
+    overflow: hidden;
+    background: #14233f;
+    color: #fff;
+    padding: 140px 0 0;
+}
+
+.ft {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+}
+
+.ft h2 {
+    font-size: 98px;
+}
+
+.fc {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, .2);
+    font-size: 14px;
+}
+
+.fc p {
+    margin: 12px 0 0;
+    line-height: 1.8;
+}
+
+.fc a:hover {
+    opacity: .6;
+}
+
+.fw {
+    margin: 56px 0 0;
+    display: flex;
+    justify-content: center;
+    font-size: 266px;
+    font-weight: 800;
+    line-height: .82;
+    letter-spacing: -.04em;
+    user-select: none;
+    opacity: 1;
+}
+
+.fb {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: .2em;
+    opacity: .6;
+    padding: 32px 0;
+}
+
+/* Суреттерді блок өлшеміне сәйкестендіру. */
+.card > img,
+.pic > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card .t p {
+    max-width: 260px;
+    font-size: 13px;
+}
+
+.menu[hidden] {
+    display: none;
+}
+
+#open-menu,
+.cx,
+.m > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.empty a {
     text-decoration: underline;
 }
 
-
-/* MAIN */
-
-main {
-    width: 85%;
-    max-width: 1100px;
-    margin: 40px auto;
+/* Басты мәтінді фонның үстіне шығару. */
+.hero .in {
+    position: relative;
+    z-index: 2;
+    padding: 0 24px;
 }
 
-.description {
-    color: #666;
+#clock {
+    font-size: 32px;
 }
 
-
-/* HOME */
-
-.hero {
-    background-color: white;
-    text-align: center;
-
-    padding: 70px 30px;
-    border-radius: 10px;
+/* Беттің ашылуы мен фонның үлкеюі. */
+body {
+    animation: fade-in 0.8s;
 }
 
-.hero h2 {
-    font-size: 36px;
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.main-button {
+.hero .bg {
+    animation: hero-zoom 2.4s ease-out;
+}
+
+@keyframes hero-zoom {
+    from { transform: scale(1.04); }
+    to { transform: scale(1); }
+}
+
+/* Экранға кірген элементті біртіндеп көрсету. */
+.reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 1s, transform 1s;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card.reveal {
+    clip-path: inset(10% 8%);
+    transition: opacity 1s, transform 1s, clip-path 1.5s;
+}
+
+.card.reveal.visible {
+    clip-path: inset(0);
+}
+
+.card:nth-child(even) {
+    transition-delay: 0.18s;
+}
+
+/* Ашық бөлімде мәзір мәтінінің түсін өзгерту. */
+nav {
+    transition: color 0.5s;
+}
+
+nav.light {
+    color: #0e1a2e;
+}
+
+.links a {
+    transition: opacity 0.3s;
+}
+
+.links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s;
+}
+
+.links a:hover::after,
+.links a[aria-current]::after {
+    transform: scaleX(1);
+}
+
+#open-menu {
+    flex-shrink: 0;
+    padding: 12px 0;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    font-weight: 500;
+}
+
+.menu {
+    animation: fade-in 0.5s;
+}
+
+/* Батырмаға меңзер келгенде фонды жылжыту. */
+.btn {
+    isolation: isolate;
+    transition: color 0.5s;
+}
+
+.btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: white;
+    transform: translateY(101%);
+    transition: transform 0.5s;
+}
+
+.btn:hover::before {
+    transform: translateY(0);
+}
+
+.btn.dk::before {
+    background: #14233f;
+}
+
+.btn.dk:hover,
+.btn.fill:hover {
+    color: white;
+}
+
+.btn.fill::before {
+    background: #2b4272;
+}
+
+/* Бөлме суреттерін жылжыту және үлкейту. */
+.card > img,
+.pic > img {
+    transform: scale(1.1);
+    transition: transform 1.6s;
+}
+
+.card::after {
+    transition: opacity 0.8s;
+}
+
+.card .n {
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    font-weight: 500;
+}
+
+.card .t p {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s, transform 0.6s;
+}
+
+.card:hover .t p,
+.card:focus-visible .t p {
+    opacity: 0.9;
+    transform: translateY(0);
+}
+
+.card .m > span:last-child {
+    transition: transform 0.5s;
+}
+
+.card:hover .m > span:last-child {
+    transform: translateX(8px);
+}
+
+.over,
+.panel {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.d,
+.s {
+    transition: background 0.4s, color 0.4s, border-color 0.4s, transform 0.4s;
+}
+
+.s:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.s[aria-pressed="true"] {
+    background: #14233f;
+    animation: fade-in 0.55s;
+}
+
+.s.mine small {
+    color: #14233f;
+}
+
+.dot {
     display: inline-block;
-
-    background-color: #3568a8;
-    color: white;
-
-    padding: 12px 25px;
-    margin-top: 15px;
-
-    text-decoration: none;
-    border-radius: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b5483f;
 }
 
-.features {
+.dot.green {
+    background: #4f7d63;
+}
+
+.panel,
+.bk {
+    animation: fade-in 0.6s;
+}
+
+.panel .ok {
     display: flex;
-    gap: 20px;
-
-    margin-top: 30px;
-}
-
-.feature {
-    flex: 1;
-
-    background-color: white;
-
-    padding: 25px;
-    border-radius: 10px;
-}
-
-
-/* ROOMS */
-
-#roomsContainer {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-
-    margin-top: 30px;
-}
-
-.room-card {
-    background-color: white;
-
-    padding: 25px;
-
-    border-radius: 10px;
-
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.room-card h3 {
-    margin-top: 0;
-}
-
-.room-card select {
-    width: 100%;
-
-    padding: 10px;
-    margin: 10px 0;
-}
-
-
-/* BUTTONS */
-
-button {
-    background-color: #3568a8;
-    color: white;
-
-    border: none;
-    border-radius: 5px;
-
-    padding: 10px 18px;
-
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #284f80;
-}
-
-.cancel-button {
-    background-color: #c0392b;
-}
-
-.cancel-button:hover {
-    background-color: #922b21;
-}
-
-
-/* BOOKINGS */
-
-.booking {
-    background-color: white;
-
-    padding: 20px;
-    margin-bottom: 15px;
-
-    border-radius: 8px;
-
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 24px;
 }
 
-
-/* STATUS */
-
-.available {
-    color: green;
+.checkmark {
+    width: 56px;
+    height: 56px;
+    flex: none;
+    fill: none;
+    stroke: #14233f;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
-.booked {
-    color: red;
+.checkmark circle {
+    stroke-dasharray: 176;
+    stroke-dashoffset: 176;
+    animation: draw-line 0.9s 0.1s forwards;
 }
 
+.checkmark path {
+    stroke-dasharray: 44;
+    stroke-dashoffset: 44;
+    animation: draw-line 0.5s 0.8s forwards;
+}
 
-/* MOBILE */
+@keyframes draw-line {
+    to { stroke-dashoffset: 0; }
+}
 
-@media (max-width: 750px) {
+/* Жоғарыға қайту белгісін айналдыру. */
+.badge {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    transition: transform 0.6s;
+}
 
-    #roomsContainer {
-        grid-template-columns: 1fr;
-    }
+.badge:hover {
+    transform: scale(1.06);
+}
 
-    .features {
-        flex-direction: column;
-    }
+.badge > svg:first-child {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+    font-size: 13.5px;
+    letter-spacing: 0.1em;
+    animation: rotate-badge 22s linear infinite;
+}
 
-    header {
-        flex-direction: column;
-        gap: 15px;
-    }
+.badge .i {
+    width: 36px;
+    height: 36px;
+}
+
+@keyframes rotate-badge {
+    to { transform: rotate(360deg); }
+}
+
+.fw span {
+    display: inline-block;
+    color: transparent;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(139, 155, 180, 0.08) 95%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    opacity: 0;
+    transform: translateY(45%);
+    transition: opacity 1.3s, transform 1.3s;
+}
+
+.fw.visible span {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.statement span {
+    transition: opacity 0.25s;
+}
+
+/* Меңзердің соңынан жүретін шыны шеңбер. */
+.glass-cursor {
+    position: fixed;
+    left: -100px;
+    top: -100px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    z-index: 100;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(1.5px) saturate(1.9) brightness(1.14);
+    -webkit-backdrop-filter: blur(1.5px) saturate(1.9) brightness(1.14);
+    box-shadow: inset 0 1px 2px white, 0 8px 28px rgba(14, 26, 46, 0.16);
+    color: white;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-shadow: 0 1px 8px #0e1a2e;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.glass-cursor.hover {
+    width: 64px;
+    height: 64px;
+}
+
+.glass-cursor.label {
+    width: 96px;
+    height: 96px;
+}
+
+body.custom-cursor,
+body.custom-cursor * {
+    cursor: none;
+}
+
+/* Мәзір сілтемелерін басуға ыңғайлы ету. */
+nav .logo,
+nav .links a {
+    flex-shrink: 0;
+}
+
+#close-menu {
+    padding: 12px;
+}
+
+.head .eyebrow {
+    margin-bottom: 16px;
+}
+
+/* Сервердің хабарын көрсету. */
+#api-message {
+    position: fixed;
+    top: 80px;
+    left: 64px;
+    right: 64px;
+    z-index: 55;
+    margin: 0;
+    padding: 12px 20px;
+    background: #f3f1ec;
+    color: #b5483f;
+    border: 1px solid #b5483f;
+}
+
+#api-message:empty {
+    display: none;
 }

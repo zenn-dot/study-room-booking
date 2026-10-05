@@ -28,9 +28,10 @@ const navigation = [
     ['My Bookings', 'bookings.html'],
     ['About', 'about.html']
 ];
-const hours = [9, 10, 11, 12, 13, 14, 15, 16];
+// Брондау уақыты: 16:10–17:10 және 17:10–18:00.
+const slotStarts = [970, 1030];
 // Node.js серверінің мекенжайы.
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:4000';
 const dates = [new Date()];
 let rooms = [];
 let bookings = [];
@@ -45,7 +46,8 @@ async function apiRequest(path, method = 'GET', body = null) {
     }
     const response = await fetch(API_URL + path, options);
     if (!response.ok) {
-        throw new Error('Server error: ' + response.status);
+        const details = await response.json().catch(() => null);
+        throw new Error(details?.error || 'Server error: ' + response.status);
     }
     // DELETE мәтін қайтарады, басқа сұраулар JSON қайтарады.
     if (method === 'DELETE') {
@@ -73,13 +75,13 @@ function timeMinutes(time) {
 // Пайдаланушының ағымдағы таңдаулары.
 let selectedRoom = 200;
 let selectedDate = 0;
-let selectedHour = null;
+let selectedTime = null;
 let completedBooking = null;
 let cancelBookingId = null;
 
 // Белгішенің HTML кодын жасау.
 function icon(name) {
-    return '<svg class="i"><use href="#' + name + '"/></svg>';
+    return '<svg class="i"><use href="#icon-' + name + '"/></svg>';
 }
 
 // Бір таңбалы санның алдына нөл қосу.
@@ -94,9 +96,19 @@ function dateLabel(date) {
     });
 }
 
-// Бір сағаттық уақыт аралығын көрсету.
-function timeLabel(hour) {
-    return pad(hour) + ':00–' + pad(hour + 1) + ':00';
+// Минут санын сағат пен минутқа айналдыру.
+function formatTime(minutes) {
+    return pad(Math.floor(minutes / 60)) + ':' + pad(minutes % 60);
+}
+
+// Соңғы брон 18:00-де аяқталады.
+function slotEnd(startMinutes) {
+    return Math.min(startMinutes + 60, 1080);
+}
+
+// Брондау аралығын көрсету.
+function timeLabel(startMinutes) {
+    return formatTime(startMinutes) + '–' + formatTime(slotEnd(startMinutes));
 }
 
 // Нөмірі бойынша бөлмені табу.
@@ -109,13 +121,13 @@ function findRoom(id) {
 }
 
 // Сервердегі бронмен қиылысатын уақытты бос емес деп белгілеу.
-function slotState(roomId, dateIndex, hour) {
+function slotState(roomId, dateIndex, startMinutes) {
     const room = findRoom(roomId);
     for (const booking of bookings) {
         if (String(booking.room_number) === room.number) {
             const times = booking.time.split('-');
-            if (hour * 60 < timeMinutes(times[1]) && (hour + 1) * 60 > timeMinutes(times[0])) {
-                return 'booked';
+            if (startMinutes < timeMinutes(times[1]) && slotEnd(startMinutes) > timeMinutes(times[0])) {
+                return booking.mine ? 'mine' : 'booked';
             }
         }
     }
@@ -126,7 +138,7 @@ function slotState(roomId, dateIndex, hour) {
 function createLayout() {
     let symbols = '';
     for (const name in ICONS) {
-        symbols += '<symbol id="' + name + '" viewBox="0 0 24 24">' + ICONS[name] + '</symbol>';
+        symbols += '<symbol id="icon-' + name + '" viewBox="0 0 24 24">' + ICONS[name] + '</symbol>';
     }
 
     let links = '';
@@ -146,10 +158,10 @@ function createLayout() {
             <div class="links">${links}</div>
             <button id="open-menu" type="button" aria-controls="menu" aria-expanded="false">MENU ${icon('menu')}</button>
         </div></nav>
-        <div class="menu" id="menu" hidden>
+        <dialog class="menu" id="menu" aria-label="Navigation">
             <button id="close-menu" aria-label="Close menu">${icon('close')}</button>
             <a href="homepage.html">Home</a>${links}
-        </div>
+        </dialog>
     `);
 
     document.body.insertAdjacentHTML('beforeend', `
@@ -161,7 +173,7 @@ function createLayout() {
                     <text><textPath href="#badge-circle" textLength="486" lengthAdjust="spacing">BOOK A ROOM · STUDY WELL · FIND YOUR FOCUS · </textPath></text></svg>
                     ${icon('up')}</button></div>
             <div class="fc">
-                <div><div class="eyebrow">Hours</div><p>Mon–Fri 08:00–20:00<br>Sat 10:00–16:00</p></div>
+                <div><div class="eyebrow">Hours</div><p>Booking hours<br>16:10–18:00</p></div>
                 <div><div class="eyebrow">Rooms</div><p><a href="rooms.html">110 · 112 · 116<br>200 · 203 · 205</a></p></div>
                 <div><div class="eyebrow">Local time</div><p id="clock"></p></div>
                 <div><div class="eyebrow">Availability</div><p><span class="dot green"></span> <span id="availability"></span></p></div>
@@ -173,10 +185,9 @@ function createLayout() {
 
     document.getElementById('open-menu').addEventListener('click', openMenu);
     document.getElementById('close-menu').addEventListener('click', closeMenu);
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeMenu();
-        }
+    document.getElementById('menu').addEventListener('cancel', function (event) {
+        event.preventDefault();
+        closeMenu();
     });
     document.getElementById('back-to-top').addEventListener('click', function () {
         window.scrollTo(0, 0);
@@ -188,7 +199,7 @@ function createLayout() {
 
 // Мәзірді ашып, бетті айналдыруды тоқтату.
 function openMenu() {
-    document.getElementById('menu').hidden = false;
+    document.getElementById('menu').showModal();
     document.getElementById('open-menu').setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
     document.getElementById('close-menu').focus();
@@ -196,7 +207,7 @@ function openMenu() {
 
 // Мәзірді жауып, бетті айналдыруды қосу.
 function closeMenu() {
-    document.getElementById('menu').hidden = true;
+    document.getElementById('menu').close();
     document.getElementById('open-menu').setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
     document.getElementById('open-menu').focus();
@@ -213,8 +224,8 @@ function updateClock() {
 function updateAvailability() {
     let freeSlots = 0;
     for (const room of rooms) {
-        for (const hour of hours) {
-            if (slotState(room.id, 0, hour) === 'free') {
+        for (const startMinutes of slotStarts) {
+            if (slotState(room.id, 0, startMinutes) === 'free') {
                 freeSlots++;
             }
         }
@@ -252,16 +263,16 @@ function showSchedule() {
             ${day}<b>${pad(dates[index].getDate())}</b></button>`;
     }
     let slotButtons = '';
-    for (const hour of hours) {
-        const state = slotState(selectedRoom, selectedDate, hour);
+    for (const startMinutes of slotStarts) {
+        const state = slotState(selectedRoom, selectedDate, startMinutes);
         let disabled = '';
         let label = 'AVAILABLE';
         if (state !== 'free') {
             disabled = 'disabled';
             label = state === 'mine' ? '<span class="dot green"></span>YOURS' : '<span class="dot"></span>BOOKED';
         }
-        slotButtons += `<button class="s ${state}" data-hour="${hour}" ${disabled}
-            aria-pressed="${hour === selectedHour}">${timeLabel(hour)}<small>${label}</small></button>`;
+        slotButtons += `<button class="s ${state}" data-time="${startMinutes}" ${disabled}
+            aria-pressed="${startMinutes === selectedTime}">${timeLabel(startMinutes)}<small>${label}</small></button>`;
     }
 
     let panel = '<p>Select an available time to continue.</p>';
@@ -271,9 +282,9 @@ function showSchedule() {
             <div><div class="eyebrow">Booked successfully</div>
             <h3>Room ${completedBooking.room}</h3><p>${dateLabel(dates[completedBooking.dateIndex])} · ${timeLabel(completedBooking.h)}</p></div></div>
             <a class="btn dk" href="bookings.html">My bookings ${icon('arrow')}</a></div>`;
-    } else if (selectedHour !== null) {
+    } else if (selectedTime !== null) {
         panel = `<div class="panel"><div><div class="eyebrow">Your selection</div>
-            <h3>Room ${room.number} · ${timeLabel(selectedHour)}</h3><p>${dateLabel(dates[selectedDate])}</p></div>
+            <h3>Room ${room.number} · ${timeLabel(selectedTime)}</h3><p>${dateLabel(dates[selectedDate])}</p></div>
             <button class="btn fill" id="book-room">Book room ${icon('bm')}</button></div>`;
     }
 
@@ -294,14 +305,14 @@ function showSchedule() {
     for (const button of document.querySelectorAll('[data-room]')) {
         button.addEventListener('click', function () {
             selectedRoom = Number(button.dataset.room);
-            selectedHour = null;
+            selectedTime = null;
             completedBooking = null;
             showSchedule();
         });
     }
-    for (const button of document.querySelectorAll('[data-hour]')) {
+    for (const button of document.querySelectorAll('[data-time]')) {
         button.addEventListener('click', function () {
-            selectedHour = Number(button.dataset.hour);
+            selectedTime = Number(button.dataset.time);
             completedBooking = null;
             showSchedule();
         });
@@ -316,36 +327,36 @@ function showSchedule() {
 
 // Бронды Node.js арқылы SQL базасына сақтау.
 async function bookRoom() {
-    if (savingBooking || selectedHour === null) return;
+    if (savingBooking || selectedTime === null) return;
     savingBooking = true;
     const button = document.getElementById('book-room');
     button.disabled = true;
     button.textContent = 'Booking...';
     showError('');
-    const hour = selectedHour;
+    const startMinutes = selectedTime;
     const room = findRoom(selectedRoom);
     let created = false;
     try {
         // Жіберер алдында сервердегі бос уақытты қайта тексеру.
         await loadBookings();
-        if (slotState(room.id, 0, hour) !== 'free') {
-            selectedHour = null;
+        if (slotState(room.id, 0, startMinutes) !== 'free') {
+            selectedTime = null;
             showSchedule();
             throw new Error('This time is already booked. Choose another time.');
         }
         await apiRequest('/bookings', 'POST', {
             room_id: room.id,
-            time: pad(hour) + ':00-' + pad(hour + 1) + ':00'
+            time: formatTime(startMinutes) + '-' + formatTime(slotEnd(startMinutes))
         });
         created = true;
-        completedBooking = { room: room.number, dateIndex: 0, h: hour };
-        selectedHour = null;
+        completedBooking = { room: room.number, dateIndex: 0, h: startMinutes };
+        selectedTime = null;
         await loadBookings();
     } catch (error) {
         if (created) {
             showError('Booking saved, but the list could not refresh. Reload the page.');
         } else {
-            showError(error.message === 'Failed to fetch' ? 'Cannot reach the server on port 3000.' : error.message);
+            showError(error.message === 'Failed to fetch' ? 'Cannot reach the server on port 4000.' : error.message);
         }
     } finally {
         savingBooking = false;
@@ -373,11 +384,14 @@ async function cancelBooking(id) {
 
 // Брондарды көрсету және жою батырмаларын қосу.
 function showBookings() {
-    bookings.sort(function (first, second) {
+    const myBookings = bookings.filter(function (booking) {
+        return booking.mine === true;
+    });
+    myBookings.sort(function (first, second) {
         return first.time.localeCompare(second.time);
     });
     let html = '';
-    for (const booking of bookings) {
+    for (const booking of myBookings) {
         let roomType = 'Study room';
         for (const room of rooms) {
             if (room.number === String(booking.room_number)) roomType = room.type;
@@ -392,7 +406,7 @@ function showBookings() {
             <div><div class="tm">${booking.time}</div></div>
             <div>${roomType}</div><div class="cx">${buttons}</div></div>`;
     }
-    if (bookings.length === 0) {
+    if (myBookings.length === 0) {
         html = '<div class="empty">No bookings yet. <a href="rooms.html">Choose a room</a> to reserve your first slot.</div>';
     }
     document.getElementById('bks').innerHTML = html;
@@ -468,7 +482,7 @@ function startEffects() {
         let label = '';
         if (target) {
             if (target.classList.contains('card')) label = 'VIEW';
-            if (target.id === 'book-room' || target.hasAttribute('data-hour')) label = 'BOOK';
+            if (target.id === 'book-room' || target.hasAttribute('data-time')) label = 'BOOK';
             if (target.hasAttribute('data-cancel') || target.hasAttribute('data-confirm')) label = 'CANCEL';
         }
         cursor.textContent = label;
@@ -577,7 +591,7 @@ async function loadPage() {
         prepareAnimations();
         updateScrollEffects();
     } catch (error) {
-        showError('Cannot load rooms or bookings. Start the Node.js server on port 3000, then reload this page.');
+        showError('Cannot load rooms or bookings. Start the Node.js server on port 4000, then reload this page.');
         document.getElementById('availability').textContent = 'Unavailable';
     }
 }

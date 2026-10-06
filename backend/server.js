@@ -1,7 +1,6 @@
 import http from 'http'
 import mysql from 'mysql2/promise'
 
-
 const db = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -9,11 +8,10 @@ const db = await mysql.createConnection({
     database: 'study_room_booking'
 })
 
-
-const server = http.createServer(async (req, res)=>{
+const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, DELETE, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers','Content-Type')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
     if (req.method === 'OPTIONS') {
         res.statusCode = 204
@@ -21,13 +19,12 @@ const server = http.createServer(async (req, res)=>{
         return
     }
 
-
-    if (req.method === 'GET' && req.url === '/rooms'){
+    if (req.method === 'GET' && req.url === '/rooms') {
         const [rooms] = await db.execute(
             'SELECT id, name, capacity FROM rooms'
         )
 
-        const result = rooms.map(function(room) {
+        const result = rooms.map(function (room) {
             return {
                 id: room.id,
                 number: room.name.replace('Room ', ''),
@@ -39,11 +36,11 @@ const server = http.createServer(async (req, res)=>{
         return
     }
 
-
-    if (req.method === 'GET' && req.url === '/bookings'){
+    if (req.method === 'GET' && req.url === '/bookings') {
         const [bookings] = await db.execute(
             `SELECT
                 bookings.id,
+                bookings.user_id,
                 rooms.name,
                 DATE_FORMAT(bookings.date, '%Y-%m-%d') AS date,
                 bookings.start_time,
@@ -52,12 +49,13 @@ const server = http.createServer(async (req, res)=>{
             JOIN rooms ON bookings.room_id = rooms.id`
         )
 
-        const result = bookings.map(function(booking) {
+        const result = bookings.map(function (booking) {
             return {
                 id: booking.id,
                 room_number: booking.name.replace('Room ', ''),
                 date: booking.date,
-                time: booking.start_time.slice(0, 5) + '-' + booking.end_time.slice(0, 5)
+                time: booking.start_time.slice(0, 5) + '-' + booking.end_time.slice(0, 5),
+                mine: booking.user_id === 1
             }
         })
 
@@ -65,8 +63,7 @@ const server = http.createServer(async (req, res)=>{
         return
     }
 
-
-    if (req.method === 'GET' && req.url === '/users'){
+    if (req.method === 'GET' && req.url === '/users') {
         const [users] = await db.execute(
             'SELECT * FROM users'
         )
@@ -75,8 +72,7 @@ const server = http.createServer(async (req, res)=>{
         return
     }
 
-
-    if (req.method === 'POST' && req.url === '/bookings'){
+    if (req.method === 'POST' && req.url === '/bookings') {
         let body = ''
 
         req.on('data', chunk => {
@@ -86,6 +82,7 @@ const server = http.createServer(async (req, res)=>{
         req.on('end', async () => {
             try {
                 const booking = JSON.parse(body)
+
                 console.log('Booking received:', booking)
 
                 const [startTime, endTime] = booking.time.split('-')
@@ -129,6 +126,7 @@ const server = http.createServer(async (req, res)=>{
 
             } catch (error) {
                 console.error(error)
+
                 res.statusCode = 500
                 res.end(JSON.stringify({
                     message: 'Booking failed'
@@ -139,8 +137,7 @@ const server = http.createServer(async (req, res)=>{
         return
     }
 
-
-    if (req.method === 'DELETE' && req.url.startsWith('/bookings')){
+    if (req.method === 'DELETE' && req.url.startsWith('/bookings')) {
         const id = req.url.split('/')[2]
 
         await db.execute(
@@ -151,10 +148,8 @@ const server = http.createServer(async (req, res)=>{
         res.end('Booking deleted')
         return
     }
-
 })
 
-
-server.listen(3000,()=>{
-    console.log('Server is runnig on port 3000')
+server.listen(3000, () => {
+    console.log('Server is running on port 3000')
 })

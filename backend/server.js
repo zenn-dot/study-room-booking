@@ -22,13 +22,10 @@ const server = http.createServer(async (req, res) => {
 
     try {
 
-        // GET /rooms
         if (req.method === 'GET' && req.url === '/rooms') {
-
             const [rooms] = await db.execute(
                 'SELECT id, name, capacity FROM rooms'
             )
-
             const result = rooms.map(function (room) {
                 return {
                     id: room.id,
@@ -41,7 +38,6 @@ const server = http.createServer(async (req, res) => {
             return
         }
 
-        // GET /bookings
         if (req.method === 'GET' && req.url === '/bookings') {
 
             const [bookings] = await db.execute(
@@ -71,9 +67,7 @@ const server = http.createServer(async (req, res) => {
             return
         }
 
-        // GET /users
         if (req.method === 'GET' && req.url === '/users') {
-
             const [users] = await db.execute(
                 'SELECT * FROM users'
             )
@@ -82,13 +76,10 @@ const server = http.createServer(async (req, res) => {
             return
         }
 
-        // GET /schedule
         if (req.method === 'GET' && req.url === '/schedule') {
-
             const [dbRooms] = await db.execute(
                 'SELECT id, name, capacity FROM rooms'
             )
-
             const [bookings] = await db.execute(
                 `SELECT
                     bookings.id,
@@ -110,40 +101,38 @@ const server = http.createServer(async (req, res) => {
             ]
 
             const rooms = dbRooms.map(function (room) {
-
-                const roomBookings = bookings.filter(function (booking){
+            const roomBookings = bookings.filter(function (booking){
                     return booking.room_id === room.id
-                })
+            })
 
-                const slots = timeSlots.map(function (time){
-                    const [startTime, endTime] = time.split('-')
+            const slots = timeSlots.map(function (time){
+            const [startTime, endTime] = time.split('-')
+            const booking = roomBookings.find(function (booking) {
+            const bookedStart = booking.start_time.slice(0, 5)
+            const bookedEnd = booking.end_time.slice(0, 5)
 
-                    const booking = roomBookings.find(function (booking) {
-                        const bookedStart = booking.start_time.slice(0, 5)
-                        const bookedEnd = booking.end_time.slice(0, 5)
-
-                        return bookedStart === startTime &&
+                    return bookedStart === startTime &&
                                bookedEnd === endTime
-                    })
+            })
 
-                    let state = 'free'
+            let state = 'free'
 
-                    if (booking) {
-                        if (booking.user_id === 1) {
-                            state = 'mine'
-                        } else {
-                            state = 'booked'
-                        }
-                    }
+            if (booking) {
+                if (booking.user_id === 1) {
+                    state = 'mine'
+                } else {
+                    state = 'booked'
+                }
+            }
 
-                    return {
-                        id: time,
-                        label: time,
-                        state: state
+            return {
+                    id: time,
+                    label: time,
+                    state: state
                     }
                 })
 
-                return {
+            return {
                     id: room.id,
                     number: room.name.replace('Room ', ''),
                     capacity: room.capacity,
@@ -176,7 +165,6 @@ const server = http.createServer(async (req, res) => {
                 })
 
             let availableSlots = 0
-
             for (const room of rooms) {
                 for (const slot of room.slots) {
                     if (slot.state === 'free') {
@@ -184,9 +172,7 @@ const server = http.createServer(async (req, res) => {
                     }
                 }
             }
-
             const today = new Date()
-
             const date = {
                 day: today.toLocaleDateString('en-GB', {
                     weekday: 'short'
@@ -198,7 +184,6 @@ const server = http.createServer(async (req, res) => {
                     year: 'numeric'
                 })
             }
-
             res.end(JSON.stringify({
                 rooms: rooms,
                 myBookings: myBookings,
@@ -210,22 +195,16 @@ const server = http.createServer(async (req, res) => {
             return
         }
 
-        // POST /bookings
         if (req.method === 'POST' && req.url === '/bookings') {
-
             let body = ''
-
             req.on('data', function (chunk) {
                 body += chunk
             })
-
             req.on('end', async function () {
 
                 try {
                     const booking = JSON.parse(body)
-
                     const [startTime, endTime] = booking.time.split('-')
-
                     const [existing] = await db.execute(
                         `SELECT id
                          FROM bookings
@@ -242,7 +221,6 @@ const server = http.createServer(async (req, res) => {
 
                     if (existing.length > 0) {
                         res.statusCode = 409
-
                         res.end(JSON.stringify({
                             error: 'This time is already booked'
                         }))
@@ -275,11 +253,8 @@ const server = http.createServer(async (req, res) => {
                     }))
 
                 } catch (error) {
-
                     console.error(error)
-
                     res.statusCode = 500
-
                     res.end(JSON.stringify({
                         error: 'Booking failed'
                     }))
@@ -288,12 +263,8 @@ const server = http.createServer(async (req, res) => {
 
             return
         }
-
-        // DELETE /bookings/:id
         if (req.method === 'DELETE' && req.url.startsWith('/bookings/')) {
-
             const id = req.url.split('/')[2]
-
             await db.execute(
                 'DELETE FROM bookings WHERE id = ?',
                 [id]
@@ -302,22 +273,17 @@ const server = http.createServer(async (req, res) => {
             res.end(JSON.stringify({
                 message: 'Booking deleted'
             }))
-
             return
         }
 
         res.statusCode = 404
-
         res.end(JSON.stringify({
             error: 'Route not found'
         }))
 
     } catch (error) {
-
         console.error(error)
-
         res.statusCode = 500
-
         res.end(JSON.stringify({
             error: 'Server error'
         }))

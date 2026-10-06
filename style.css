@@ -168,13 +168,20 @@ nav .wrap {
 .menu {
     position: fixed;
     inset: 0;
-    z-index: 60;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    z-index: 1000;
     background: #14233f;
     color: #fff;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
-    padding: 0 112px;
+    padding: 72px 112px;
+    overflow-y: auto;
     opacity: 1;
     pointer-events: auto;
 }
@@ -653,8 +660,8 @@ footer {
     font-size: 13px;
 }
 
-.menu[hidden] {
-    display: none;
+.menu[open] {
+    display: flex;
 }
 
 #open-menu,
@@ -975,10 +982,10 @@ nav.light {
     height: 44px;
     display: grid;
     place-items: center;
-    z-index: 100;
+    z-index: 1100;
     pointer-events: none;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    border: 2px solid rgba(255, 255, 255, 0.45);
     background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.04));
     backdrop-filter: blur(1.5px) saturate(1.9) brightness(1.14);
     -webkit-backdrop-filter: blur(1.5px) saturate(1.9) brightness(1.14);
